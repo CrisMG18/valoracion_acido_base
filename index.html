@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador de valoración ácido-base · 4.º ESO</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1f2937;background:#f4f7fb}
+*{box-sizing:border-box}body{margin:0;padding:18px}.wrap{max-width:980px;margin:auto}
+header{padding:24px 20px;background:#17324d;color:white;border-radius:18px;margin-bottom:16px}
+h1{font-size:clamp(1.45rem,4vw,2rem);margin:0 0 8px}header p{margin:0;color:#dce8f2}
+.card{background:white;border:1px solid #dce4ed;border-radius:16px;padding:20px;margin:14px 0;box-shadow:0 3px 12px #19324b0a}
+h2{font-size:1.2rem;margin:0 0 12px}h3{font-size:1.02rem;margin:12px 0 8px}
+.muted{color:#64748b;font-size:.92rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+label{display:block;font-weight:600;margin:9px 0 5px}select,input[type=number],input[type=text]{font:inherit;padding:10px;border:1px solid #bdcbd9;border-radius:9px;width:100%;background:white}
+input[type=range]{width:100%;accent-color:#2878b5}button{font:inherit;border:0;border-radius:9px;padding:10px 14px;background:#1769aa;color:white;cursor:pointer}
+button:hover{filter:brightness(.95)}button.secondary{background:#eaf0f6;color:#23394c;border:1px solid #cbd8e5}button:disabled{opacity:.45;cursor:not-allowed}
+.pills{display:flex;gap:8px;flex-wrap:wrap}.stat{background:#f1f6fa;padding:12px;border-radius:10px}.stat strong{display:block;font-size:1.1rem;margin-top:4px}
+.lab{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center}
+svg{width:100%;max-height:300px;background:#fbfdff;border-radius:12px;border:1px solid #e4ebf2}
+.status{padding:12px;border-radius:10px;background:#f1f6fa;margin-top:12px}.status.good{background:#e8f7ed;color:#155b2c}.status.warn{background:#fff4dd;color:#744b00}
+.hidden{display:none!important}.result{font-size:1.2rem;font-weight:700}.formula{background:#f5f8fb;border-radius:10px;padding:12px;overflow-wrap:anywhere}
+footer{text-align:center;color:#64748b;font-size:.85rem;padding:12px}
+@media(max-width:620px){body{padding:10px}.card{padding:15px}.lab{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Simulador de valoración ácido-base</h1>
+<p>Física y Química · 4.º ESO · Determinación de la concentración de NaOH</p>
+</header>
+
+<section class="card">
+<h2>1. Selecciona la disolución problema</h2>
+<p class="muted">Elige una disolución de NaOH. Su concentración real no se muestra en esta pantalla.</p>
+<label for="solution">Disolución de la bureta</label>
+<select id="solution">
+<option>Disolución 1</option><option>Disolución 2</option><option>Disolución 3</option><option>Disolución 4</option><option>Disolución 5</option>
+</select>
+<div class="grid" style="margin-top:12px">
+<div>
+<label for="acidC">Concentración conocida de HCl (mol/L)</label>
+<input id="acidC" type="number" min="0.01" max="1" step="0.005" value="0.100">
+</div>
+<div>
+<label for="acidV">Volumen de HCl en el matraz (mL)</label>
+<input id="acidV" type="number" min="5" max="100" step="1" value="25">
+</div>
+<div class="stat"><span class="muted">Matraz Erlenmeyer</span><strong id="acidLabel">25 mL de HCl</strong><span id="acidConcLabel">0,100 mol/L</span></div>
+<div class="stat"><span class="muted">Bureta</span><strong>NaOH</strong><span id="solutionLabel">Disolución 1</span></div>
+</div>
+</section>
+
+<section class="card">
+<h2>2. Realiza la valoración</h2>
+<p class="muted">Añade NaOH poco a poco y observa el color de la fenolftaleína. Puedes usar los botones de incremento o el deslizador.</p>
+<div class="lab">
+<div>
+<svg viewBox="0 0 320 300" role="img" aria-label="Bureta con NaOH sobre un matraz Erlenmeyer con HCl y fenolftaleína">
+  <rect x="137" y="16" width="26" height="135" rx="3" fill="#e6f3fc" stroke="#53758a" stroke-width="1.5"/>
+  <rect id="bureteliquid" x="141" y="20" width="18" height="118" fill="#70b6e8" opacity=".9"/>
+  <line id="meniscus" x1="140" y1="138" x2="160" y2="138" stroke="#21699b" stroke-width="2"/>
+  <g stroke="#45616f" stroke-width="1">
+    <line x1="138" y1="30" x2="151" y2="30"/><line x1="138" y1="42" x2="147" y2="42"/>
+    <line x1="138" y1="54" x2="151" y2="54"/><line x1="138" y1="66" x2="147" y2="66"/>
+    <line x1="138" y1="78" x2="151" y2="78"/><line x1="138" y1="90" x2="147" y2="90"/>
+    <line x1="138" y1="102" x2="151" y2="102"/><line x1="138" y1="114" x2="147" y2="114"/>
+    <line x1="138" y1="126" x2="151" y2="126"/>
+  </g>
+  <text x="172" y="36" font-size="12" fill="currentColor">NaOH</text>
+  <text x="172" y="51" font-size="10" fill="currentColor">en bureta</text>
+  <path d="M143 151 L143 166 L156 166 L156 151" fill="#e6f3fc" stroke="#53758a" stroke-width="1.5"/>
+  <path d="M150 166 L150 181" stroke="#70b6e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M105 166 L105 186 L84 240 Q80 252 97 252 L203 252 Q220 252 216 240 L195 186 L195 166 Z" fill="#eef5fa" stroke="#53758a" stroke-width="2"/>
+  <path id="flaskliquid" d="M92 218 L208 218 L216 241 Q219 250 203 250 L97 250 Q83 250 88 240 Z" fill="#d9eef8"/>
+  <path id="flaskmeniscus" d="M92 218 Q150 212 208 218" stroke="#70a9c6" stroke-width="1.5" fill="none"/>
+  <text x="150" y="267" font-size="11" fill="currentColor" text-anchor="middle">HCl + fenolftaleína</text>
+  <text id="flaskColorLabel" x="150" y="283" font-size="11" fill="currentColor" text-anchor="middle">Disolución incolora</text>
+  <text x="17" y="76" font-size="11" fill="currentColor">Volumen</text><text x="17" y="90" font-size="11" fill="currentColor">añadido</text>
+  <text id="svgVolume" x="17" y="112" font-size="16" font-weight="700" fill="currentColor">0,0 mL</text>
+  <path d="M80 108 L126 108" stroke="currentColor" opacity=".35" stroke-dasharray="3 3"/>
+</svg>
+</div>
+<div>
+<div class="stat"><span class="muted">Volumen de NaOH añadido</span><strong class="result" id="volumeReadout">0,0 mL</strong></div>
+<label for="volume">Ajusta el volumen añadido (0–50 mL)</label>
+<input id="volume" type="range" min="0" max="50" step=".1" value="0">
+<div class="pills" style="margin-top:10px">
+<button class="secondary" data-add=".1">+0,1 mL</button><button class="secondary" data-add=".5">+0,5 mL</button>
+<button class="secondary" data-add="1">+1 mL</button><button class="secondary" data-add="2">+2 mL</button>
+<button class="secondary" data-add="5">+5 mL</button><button class="secondary" id="minus">−1 mL</button>
+</div>
+<div class="pills" style="margin-top:10px"><button id="record">Registrar volumen</button><button class="secondary" id="reset">Reiniciar valoración</button></div>
+<div id="status" class="status">La disolución permanece incolora. Añade NaOH gradualmente.</div>
+<p class="muted">El viraje de la fenolftaleína es una aproximación visual del punto final; puede no coincidir exactamente con el punto de equivalencia.</p>
+</div>
+</div>
+<h3>Registro de lecturas</h3><div id="records" class="pills"><span class="muted">Todavía no hay lecturas registradas.</span></div>
+</section>
+
+<section class="card">
+<h2>3. Calcula y comprueba la concentración</h2>
+<p>Utiliza el volumen registrado que consideres más próximo al punto final para calcular la concentración de NaOH.</p>
+<div class="stat"><span class="muted">Última lectura registrada</span><strong id="selectedVolume">Ninguna lectura</strong></div>
+<label for="studentC">Concentración de NaOH calculada (mol/L)</label>
+<input id="studentC" type="text" inputmode="decimal" placeholder="Ej.: 0,080">
+<button id="check" style="margin-top:10px" disabled>Comprobar mi resultado</button>
+<div id="checkResult" class="status hidden"></div>
+<hr style="border:0;border-top:1px solid #e3eaf1;margin:20px 0">
+<h3>Ayuda para calcular la concentración de NaOH</h3>
+<button class="secondary" id="toggleSolution">Ver ayuda: fórmulas</button>
+<div id="solutionWork" class="hidden">
+<p>Ayuda: en el punto de equivalencia, la reacción entre HCl y NaOH presenta una proporción molar 1:1:</p>
+<div class="formula">C<sub>HCl</sub> × V<sub>HCl</sub> = C<sub>NaOH</sub> × V<sub>NaOH</sub></div>
+<p>Despejando la concentración de NaOH:</p>
+<div class="formula">C<sub>NaOH</sub> = (C<sub>HCl</sub> × V<sub>HCl</sub>) / V<sub>NaOH</sub></div>
+
+</div>
+</section>
+
+<footer>Simulador didáctico: los cálculos de concentración se basan en una reacción HCl–NaOH de proporción molar 1:1.</footer>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const names = ["Disolución 1","Disolución 2","Disolución 3","Disolución 4","Disolución 5"];
+  const initialBases = [.08,.12,.06,.10,.15];
+  let bases = [...initialBases], records = [], selected = 0;
+  const num = (x,d=3) => Number(x).toLocaleString("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d});
+  const chosenIndex = () => names.indexOf($("solution").value);
+  const acidC = () => Math.min(.2,Math.max(.05,Number($("acidC").value)||.1));
+  const acidV = () => Math.min(40,Math.max(10,Number($("acidV").value)||25));
+  const baseC = () => bases[chosenIndex()];
+  const eq = () => acidC()*acidV()/baseC();
+  const volume = () => Number($("volume").value);
+  function renderRecords(){
+    const root=$("records"); root.innerHTML="";
+    if(!records.length){root.innerHTML='<span class="muted">Todavía no hay lecturas registradas.</span>';return;}
+    records.forEach((v,i)=>{
+      const b=document.createElement("button"); b.className="secondary"; b.textContent=`${i+1}: ${num(v,1)} mL`;
+      b.title="Usar esta lectura para comprobar el cálculo";
+      b.onclick=()=>{selected=v;update();};root.appendChild(b);
+    });
+  }
+  function update(){
+    const v=volume(), acid=acidC(), av=acidV(), bc=baseC();
+    $("volumeReadout").textContent=num(v,1)+" mL";
+    $("svgVolume").textContent=num(v,1)+" mL";
+    $("acidLabel").textContent=av+" mL de HCl";
+    $("acidConcLabel").textContent=num(acid,3)+" mol/L";
+    $("solutionLabel").textContent=$("solution").value;
+    // SVG liquid level descends as more solution is dispensed.
+    const liquidHeight=Math.max(2,118-v*2.25), top=138-liquidHeight;
+    $("bureteliquid").setAttribute("y",top);$("bureteliquid").setAttribute("height",liquidHeight);
+    $("meniscus").setAttribute("y1",top);$("meniscus").setAttribute("y2",top);
+    const excess=bc*v-acid*av;
+    const pink=v>0 && excess>Math.max(.001,acid*av*.025);
+    $("flaskliquid").setAttribute("fill",pink?"#e981b1":"#d9eef8");
+    $("flaskmeniscus").setAttribute("stroke",pink?"#c53b7d":"#70a9c6");
+    $("flaskColorLabel").textContent=pink?"Color rosa":"Disolución incolora";
+    $("status").className="status"+(pink?" warn":"");
+    $("status").textContent=pink
+      ?"La disolución presenta color rosa. Puede que hayas añadido un ligero exceso de NaOH; revisa la lectura del punto final."
+      :"La disolución permanece incolora. Añade NaOH gradualmente y observa cuándo aparece un color rosa persistente.";
+    $("selectedVolume").textContent=selected>0?num(selected,1)+" mL":"Ninguna lectura";
+    $("check").disabled=!(selected>0 && $("studentC").value.trim());
+  }
+  function reset(){
+    $("volume").value=0;records=[];selected=0;$("studentC").value="";$("checkResult").classList.add("hidden");renderRecords();update();
+  }
+  $("solution").addEventListener("change",reset);
+  $("volume").addEventListener("input",update);
+  document.querySelectorAll("[data-add]").forEach(b=>b.addEventListener("click",()=>{$("volume").value=Math.min(50,Math.round((volume()+Number(b.dataset.add))*10)/10);update();}));
+  $("minus").onclick=()=>{$("volume").value=Math.max(0,Math.round((volume()-1)*10)/10);update();};
+  $("record").onclick=()=>{records.push(Math.round(volume()*10)/10);selected=records[records.length-1];renderRecords();update();};
+  $("reset").onclick=reset;
+  $("studentC").addEventListener("input",()=>{ $("checkResult").classList.add("hidden");update();});
+  $("check").onclick=()=>{
+    const entered=Number($("studentC").value.trim().replace(",","."));
+    const expected=acidC()*acidV()/selected;
+    const box=$("checkResult");box.classList.remove("hidden");
+    if(Number.isFinite(entered)&&Math.abs(entered-expected)<=.003){
+      box.className="status good";box.textContent="¡Resultado correcto! Está dentro del margen de tolerancia. La precisión depende de la lectura del punto final.";
+    } else {
+      box.className="status warn";box.textContent="Revisa el cálculo: comprueba que has usado los volúmenes en las mismas unidades y despejado correctamente la concentración. Revisa también la lectura del punto final.";
+    }
+  };
+  $("toggleSolution").onclick=()=>{$("solutionWork").classList.toggle("hidden");$("toggleSolution").textContent=$("solutionWork").classList.contains("hidden")?"Ver ayuda: fórmulas":"Ocultar ayuda";};
+  $("toggleTeacher").onclick=()=>{$("teacher").classList.toggle("hidden");$("toggleTeacher").textContent=$("teacher").classList.contains("hidden")?"Mostrar configuración":"Ocultar configuración";};
+  $("acidC").addEventListener("change",()=>{reset();update();});
+  $("acidV").addEventListener("change",()=>{reset();update();});
+  update();
+})();
+</script>
+</body>
+</html>
